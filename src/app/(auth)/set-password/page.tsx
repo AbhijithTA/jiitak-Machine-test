@@ -1,8 +1,6 @@
 'use client'
 
-
 import React, { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
 
 const LoginPasswordApp = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -18,7 +16,7 @@ const LoginPasswordApp = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       alert('パスワードが一致しません');
@@ -31,21 +29,21 @@ const LoginPasswordApp = () => {
     alert('パスワードが設定されました！');
   };
 
-  const validatePassword = (pwd) => {
-    const hasHalfWidth = /[a-zA-Z0-9]/.test(pwd);
-    const hasFullWidth = /[^\x00-\x7F]/.test(pwd);
-    const hasNumber = /\d/.test(pwd);
-    const length = pwd.length >= 8 && pwd.length <= 20;
-    
-    return { hasHalfWidth, hasFullWidth, hasNumber, length };
-  };
+  const validatePassword = (pwd: string) => {
+  const hasUpper = /[A-Z]/.test(pwd);
+  const hasLower = /[a-z]/.test(pwd);
+  const hasNumber = /\d/.test(pwd);
+  const isHalfWidth = /^[\x20-\x7E]+$/.test(pwd); 
+  const lengthValid = pwd.length >= 8 && pwd.length <= 20;
 
-  const validation = validatePassword(password);
-  const isValid = validation.hasHalfWidth && validation.hasNumber && validation.length;
+  return hasUpper && hasLower && hasNumber && isHalfWidth && lengthValid;
+};
+
+const isValid = validatePassword(password);
+
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200 px-4 py-3 sm:px-6 lg:px-8">
         <div className="flex items-center">
           <div className="flex items-center space-x-2">
@@ -57,10 +55,8 @@ const LoginPasswordApp = () => {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="flex-1 flex items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8">
-          {/* Title */}
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
               パスワード設定
@@ -72,9 +68,7 @@ const LoginPasswordApp = () => {
             </p>
           </div>
 
-          {/* Form */}
-          <div className="space-y-6">
-            {/* Password Field */}
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                 パスワード
@@ -88,21 +82,15 @@ const LoginPasswordApp = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 pr-20"
                   placeholder=""
+                  required
                 />
-                <div className="absolute inset-y-0 right-2 flex items-center space-x-1">
-                  <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 border border-gray-300 rounded text-xs">
-                    表示
-                  </span>
+                <div className="absolute inset-y-0 right-2 flex items-center">
                   <button
                     type="button"
                     onClick={togglePasswordVisibility}
-                    className="p-1"
+                    className="text-sm text-gray-500 bg-gray-100 px-2 py-1 border border-gray-300 rounded text-xs hover:bg-gray-200 transition-colors"
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-gray-400 hover:text-gray-600" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-gray-400 hover:text-gray-600" />
-                    )}
+                    {showPassword ? '非表示' : '表示'}
                   </button>
                 </div>
               </div>
@@ -111,7 +99,6 @@ const LoginPasswordApp = () => {
               </p>
             </div>
 
-            {/* Confirm Password Field */}
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
                 パスワード確認用
@@ -125,56 +112,33 @@ const LoginPasswordApp = () => {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 pr-20"
                   placeholder=""
+                  required
                 />
-                <div className="absolute inset-y-0 right-2 flex items-center space-x-1">
-                  <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 border border-gray-300 rounded text-xs">
-                    表示
-                  </span>
+                <div className="absolute inset-y-0 right-2 flex items-center">
                   <button
                     type="button"
                     onClick={toggleConfirmPasswordVisibility}
-                    className="p-1"
+                    className="text-sm text-gray-500 bg-gray-100 px-2 py-1 border border-gray-300 rounded text-xs hover:bg-gray-200 transition-colors"
                   >
-                    {showConfirmPassword ? (
-                      <EyeOff className="h-4 w-4 text-gray-400 hover:text-gray-600" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-gray-400 hover:text-gray-600" />
-                    )}
+                    {showConfirmPassword ? '非表示' : '表示'}
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Validation Messages */}
-            {password && (
-              <div className="space-y-1">
-                <div className={`text-xs ${validation.length ? 'text-green-600' : 'text-red-600'}`}>
-                  ✓ 8文字以上20文字以内
-                </div>
-                <div className={`text-xs ${validation.hasHalfWidth ? 'text-green-600' : 'text-red-600'}`}>
-                  ✓ 半角文字を含む
-                </div>
-                <div className={`text-xs ${validation.hasNumber ? 'text-green-600' : 'text-red-600'}`}>
-                  ✓ 数字を含む
-                </div>
-              </div>
-            )}
-
-            {/* Submit Button */}
             <div className="pt-4">
               <button
-                onClick={handleSubmit}
+                type="submit"
                 disabled={!isValid || password !== confirmPassword}
                 className="w-full flex justify-center py-3 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-orange-400 hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
               >
                 設定
               </button>
             </div>
-          </div>
+          </form>
         </div>
       </main>
 
-      {/* Footer (optional) */}
       <footer className="bg-white border-t border-gray-200 px-4 py-4 sm:px-6 lg:px-8">
         <div className="text-center text-xs text-gray-500">
           © 2025 ルックミール. All rights reserved.
