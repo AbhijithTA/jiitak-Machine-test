@@ -1,4 +1,7 @@
 @import "@fontsource/noto-sans-jp";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root { color-scheme: light; }
 html, body, #__next { height: 100%; }
