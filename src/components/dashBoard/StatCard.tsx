@@ -2,7 +2,7 @@ import React from 'react';
 import { DashboardStat } from './types';
 import { FiUsers, FiAward, FiSearch, FiTrash2 } from 'react-icons/fi';
 
-const getIcon = (iconName: string) => {
+const getIcon = (iconName: DashboardStat["icon"]) => {
   const iconMap = {
     users: <FiUsers className="w-4 h-4" />,
     award: <FiAward className="w-4 h-4" />,
@@ -11,6 +11,7 @@ const getIcon = (iconName: string) => {
   };
   return iconMap[iconName] || <FiUsers className="w-4 h-4" />;
 };
+
 
 const StatCard: React.FC<{ stat: DashboardStat; isSmall?: boolean }> = ({ stat, isSmall = false }) => (
   <div className={`bg-white rounded-lg shadow-sm border border-gray-100 p-4 ${

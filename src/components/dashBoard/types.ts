@@ -5,8 +5,8 @@ export type DashboardStat = {
   unit: string;
   subValue: string;
   change: string;
-  changeType: 'up' | 'down';
-  icon: string;
+  changeType: "up" | "down" | string;
+  icon: "users" | "award" | "search" | "trash";
 };
 
 export type User = {
