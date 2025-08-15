@@ -1,46 +1,51 @@
-'use client'
+'use client';
 
 import React, { useState } from 'react';
+import { showError, showSuccess } from '@/lib/toast';
+import { useRouter } from 'next/navigation';
 
-const LoginPasswordApp = () => {
+const SetPasswordPage = () => {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(!showConfirmPassword);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password !== confirmPassword) {
-      alert('パスワードが一致しません');
-      return;
-    }
-    if (password.length < 8 || password.length > 20) {
-      alert('パスワードは8文字以上20文字以内で入力してください');
-      return;
-    }
-    alert('パスワードが設定されました！');
-  };
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
+  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword);
 
   const validatePassword = (pwd: string) => {
-  const hasUpper = /[A-Z]/.test(pwd);
-  const hasLower = /[a-z]/.test(pwd);
-  const hasNumber = /\d/.test(pwd);
-  const isHalfWidth = /^[\x20-\x7E]+$/.test(pwd); 
-  const lengthValid = pwd.length >= 8 && pwd.length <= 20;
+    const hasUpper = /[A-Z]/.test(pwd);
+    const hasLower = /[a-z]/.test(pwd);
+    const hasNumber = /\d/.test(pwd);
+    const isHalfWidth = /^[\x20-\x7E]+$/.test(pwd);
+    const lengthValid = pwd.length >= 8 && pwd.length <= 20;
+    return hasUpper && hasLower && hasNumber && isHalfWidth && lengthValid;
+  };
 
-  return hasUpper && hasLower && hasNumber && isHalfWidth && lengthValid;
-};
+  const isValid = validatePassword(password);
 
-const isValid = validatePassword(password);
+  // this the submit function
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
+    if (password !== confirmPassword) {
+      showError('パスワードが一致しません');
+      return;
+    }
+    if (!isValid) {
+      showError('パスワードは8文字以上20文字以内で、半角英数字を含めてください');
+      return;
+    }
+
+    setLoading(true);
+    setTimeout(() => {
+      showSuccess('パスワードが設定されました！');
+      setLoading(false);
+      router.push('/login');
+    }, 1500);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -76,12 +81,10 @@ const isValid = validatePassword(password);
               <div className="relative">
                 <input
                   id="password"
-                  name="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 pr-20"
-                  placeholder=""
                   required
                 />
                 <div className="absolute inset-y-0 right-2 flex items-center">
@@ -106,12 +109,10 @@ const isValid = validatePassword(password);
               <div className="relative">
                 <input
                   id="confirmPassword"
-                  name="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 pr-20"
-                  placeholder=""
                   required
                 />
                 <div className="absolute inset-y-0 right-2 flex items-center">
@@ -129,23 +130,21 @@ const isValid = validatePassword(password);
             <div className="pt-4">
               <button
                 type="submit"
-                disabled={!isValid || password !== confirmPassword}
+                disabled={!isValid || password !== confirmPassword || loading}
                 className="w-full flex justify-center py-3 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-orange-400 hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
               >
-                設定
+                {loading ? (
+                  <span className="loader border-2 border-t-transparent border-white rounded-full w-5 h-5 animate-spin"></span>
+                ) : (
+                  '設定'
+                )}
               </button>
             </div>
           </form>
         </div>
       </main>
-
-      <footer className="bg-white border-t border-gray-200 px-4 py-4 sm:px-6 lg:px-8">
-        <div className="text-center text-xs text-gray-500">
-          © 2025 ルックミール. All rights reserved.
-        </div>
-      </footer>
     </div>
   );
 };
 
-export default LoginPasswordApp;
+export default SetPasswordPage;

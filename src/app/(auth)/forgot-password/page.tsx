@@ -1,46 +1,54 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { showError, showSuccess } from '@/lib/toast';
+import NavbarComponent from "@/components/Navbar";
 
 const PasswordResetPage: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [emailError, setEmailError] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = (): void => {
+  const handleSubmit = async (): Promise<void> => {
+    setIsSubmitting(true);
+
+    // Validate email
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setEmailError("有効なメールアドレスを入力してください");
+      showError("有効なメールアドレスを入力してください");
+      setIsSubmitting(false);
       return;
     }
     setEmailError("");
 
-    alert("パスワード再設定用URLを送信しました");
-    // Frontend only - no real logic needed
+    try {
+      // Simulating API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      showSuccess("パスワード再設定用URLをメールで送信しました");
+
+      // Redirect after 2 seconds
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
+    } catch (error) {
+      showError("送信に失敗しました。もう一度お試しください");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleBackToLogin = (): void => {
-    alert("ログイン画面に戻ります");
-    // Frontend only - navigation would go here
+    showSuccess("ログイン画面に戻ります");
+    router.push("/login");
   };
 
   return (
     <div className="min-h-screen bg-brand-bg flex flex-col">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200 px-4 py-3 sm:px-6 lg:px-8">
-        <div className="flex items-center">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-brand-primary rounded-full flex items-center justify-center">
-              <span className="text-white text-sm font-bold">ル</span>
-            </div>
-            <h1 className="text-xl font-semibold text-brand-primary">
-              ルックミール
-            </h1>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
+      <NavbarComponent showAvatar={false} />
       <main className="flex-1 flex items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8">
-          {/* Title and Description */}
           <div className="text-center">
             <h2 className="text-2xl font-bold text-brand-text mb-6">
               パスワード再設定
@@ -55,9 +63,7 @@ const PasswordResetPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Form */}
           <div className="space-y-6">
-            {/* Email Field */}
             <div>
               <label
                 htmlFor="email"
@@ -70,26 +76,36 @@ const PasswordResetPage: React.FC = () => {
                 name="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setEmailError("");
+                }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary"
-                placeholder=""
+                placeholder="example@example.com"
               />
-              <p className="mt-2 text-sm" style={{ color: "#FF3B30" }}>
-                {emailError}
-              </p>
+              {emailError && (
+                <p className="mt-2 text-sm text-red-500">
+                  {emailError}
+                </p>
+              )}
             </div>
 
-            {/* Submit Button */}
             <div className="pt-4">
               <button
                 onClick={handleSubmit}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-pill shadow-sm text-sm font-medium text-white bg-brand-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary transition-colors duration-200"
+                disabled={isSubmitting}
+                className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-pill shadow-sm text-sm font-medium text-white bg-brand-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary transition-colors duration-200 ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                  }`}
               >
-                パスワード再設定用URLを送信する
+                {isSubmitting ? (
+                  "送信中..."
+                ) : (
+                  "パスワード再設定用URLを送信する"
+                )}
               </button>
             </div>
 
-            {/* Back to Login Link */}
+
             <div className="text-center pt-4">
               <button
                 onClick={handleBackToLogin}
@@ -101,13 +117,6 @@ const PasswordResetPage: React.FC = () => {
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 px-4 py-4 sm:px-6 lg:px-8">
-        <div className="text-center text-xs text-gray-500">
-          © 2025 ルックミール. All rights reserved.
-        </div>
-      </footer>
     </div>
   );
 };
